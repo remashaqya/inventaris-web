@@ -1,71 +1,45 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Data Inventaris</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-  </head>
-  <body class="bg-gray-100 font-sans">
-    <header
-      class="bg-emerald-600 text-white p-4 shadow-md sticky top-0 flex justify-between items-center"
-    >
-      <h1 class="text-xl font-bold">
-        <i class="fas fa-boxes mr-2"></i>Inventaris
-      </h1>
-      <a href="index.html" class="text-white"
-        ><i class="fas fa-arrow-left text-xl"></i
-      ></a>
-    </header>
-    <main class="p-4 max-w-4xl mx-auto">
-      <div class="bg-white rounded-xl shadow overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-gray-200 text-gray-700 text-sm">
-              <th class="p-3">No. IVT</th>
-              <th class="p-3">Nama Barang</th>
-              <th class="p-3">Kondisi</th>
-              <th class="p-3">Status</th>
-            </tr>
-          </thead>
-          <tbody id="tbBody" class="text-sm">
-            <tr>
-              <td colspan="4" class="p-4 text-center">Memuat data...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </main>
-    <script>
-      const API_URL = "https://script.google.com/macros/s/AKfycbxx84YFVSb92cwBOX94F8twWkb1epAPV3nWiwRJX-HjrnK8jddlSgRxXqwTBvpPqPuF9A/exec";
-      fetch(API_URL, {
-        redirect: "follow",
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "getInventaris" }),
-      })
-        .then((r) => r.json())
-        .then((res) => {
-          let html = "";
-          res.data.forEach((row) => {
-            let warna =
-              row[4] == "Baik"
-                ? "bg-emerald-500"
-                : row[4] == "Cukup Baik"
-                  ? "bg-yellow-400 text-black"
-                  : row[4] == "Cukup Rusak"
-                    ? "bg-orange-500"
-                    : "bg-red-600";
-            html += `<tr class="border-b hover:bg-gray-50"><td class="p-3 font-mono text-xs">${row[1]}</td><td class="p-3 font-bold">${row[2]}<br><span class="text-xs text-gray-500">${row[3]}</span></td><td class="p-3"><span class="px-2 py-1 rounded text-white text-xs ${warna}">${row[4]}</span></td><td class="p-3 font-semibold ${row[5] == "Tersedia" ? "text-emerald-600" : "text-red-600"}">${row[5]}</td></tr>`;
-          });
-          document.getElementById("tbBody").innerHTML =
-            html ||
-            '<tr><td colspan="4" class="text-center p-4">Belum ada data</td></tr>';
-        });
-    </script>
-  </body>
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data Inventaris</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+  <header class="bg-emerald-600 text-white p-4 shadow-md sticky top-0 flex justify-between items-center z-10">
+    <h1 class="text-xl font-bold"><i class="fas fa-boxes mr-2"></i>Inventaris</h1>
+    <a href="index.html" class="text-white"><i class="fas fa-arrow-left text-xl"></i></a>
+  </header>
+  <main class="p-4 max-w-lg mx-auto" id="tbBody">
+    <!-- Skeleton Loading -->
+    <div class="text-center text-gray-500 mt-10"><i class="fas fa-circle-notch fa-spin text-3xl mb-2 text-emerald-500"></i><p>Memuat data...</p></div>
+  </main>
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxx84YFVSb92cwBOX94F8twWkb1epAPV3nWiwRJX-HjrnK8jddlSgRxXqwTBvpPqPuF9A/exec"; 
+    fetch(API_URL, { redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({action: "getInventaris"}) })
+    .then(r => r.json()).then(res => {
+      let html = '';
+      res.data.reverse().forEach(row => { // Reverse agar data terbaru di atas
+        let kondisi = row[4];
+        let warnaK = kondisi=='Baik'?'bg-emerald-500':kondisi=='Cukup Baik'?'bg-yellow-400 text-gray-800':kondisi=='Cukup Rusak'?'bg-orange-500':'bg-red-600';
+        let warnaS = row[5]=='Tersedia'?'text-emerald-600':'text-red-600';
+
+        html += `
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex justify-between items-center mb-3">
+          <div>
+            <p class="text-[11px] text-gray-400 font-mono font-bold tracking-wider mb-0.5">${row[1]}</p>
+            <h3 class="font-bold text-gray-800 text-lg leading-tight">${row[2]}</h3>
+            <p class="text-xs text-gray-500 mt-1"><i class="fas fa-tag mr-1 text-gray-300"></i>${row[3]}</p>
+          </div>
+          <div class="flex flex-col items-end gap-2">
+            <span class="px-2.5 py-1 rounded-md text-white text-[10px] font-bold shadow-sm ${warnaK}">${kondisi}</span>
+            <span class="font-bold text-sm ${warnaS}">${row[5]}</span>
+          </div>
+        </div>`;
+      });
+      document.getElementById('tbBody').innerHTML = html || '<div class="text-center text-gray-500 mt-10">Belum ada data inventaris.</div>';
+    });
+  </script>
+</body>
 </html>
