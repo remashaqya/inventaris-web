@@ -51,6 +51,23 @@
     </div>
   </div>
 
+  <!-- MODAL EDIT DATA -->
+  <div id="modalEdit" class="hidden fixed inset-0 modal-bg z-[55] flex justify-center items-end sm:items-center">
+    <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl p-5 shadow-xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-lg"><i class="fas fa-edit text-yellow-500 mr-2"></i>Edit Informasi Barang</h3><button onclick="closeModal('modalEdit'); resumeScan();" class="text-red-500"><i class="fas fa-times text-xl"></i></button></div>
+      <form id="formEditAct" onsubmit="submitEdit(event)">
+        <input type="hidden" id="editBarcode">
+        <label class="block text-sm font-bold mb-1">Nama Barang (Bisa diubah)</label>
+        <input type="text" id="editNama" required class="w-full p-2 border rounded mb-3">
+        <label class="block text-sm font-bold mb-1">Kondisi Fisik Saat Ini</label>
+        <select id="editKondisi" class="w-full p-2 border rounded mb-5">
+          <option value="Baik">🟢 Baik</option><option value="Cukup Baik">🟡 Cukup Baik</option><option value="Cukup Rusak">🟠 Cukup Rusak</option><option value="Rusak">🔴 Rusak</option>
+        </select>
+        <button type="submit" class="w-full bg-yellow-500 text-white p-3 rounded-lg font-bold">Simpan Perubahan</button>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL DETAIL -->
   <div id="modalDetail" class="hidden fixed inset-0 modal-bg z-50 flex justify-center items-end sm:items-center">
     <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl p-5 shadow-xl">
@@ -103,18 +120,16 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxx84YFVSb92cwBOX94F8twWkb1epAPV3nWiwRJX-HjrnK8jddlSgRxXqwTBvpPqPuF9A/exec"; 
 
-    let html5QrcodeScanner; let isPaused = false;
+    // Helper Hapus Cache agar web terupdate otomatis saat selesai edit/pinjam
+    function clearCache() { localStorage.removeItem('cache_inventaris'); localStorage.removeItem('cache_riwayat'); }
 
-    window.onload = function() {
-      html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
-      html5QrcodeScanner.render(onScanSuccess);
-    };
+    let html5QrcodeScanner; let isPaused = false;
+    window.onload = function() { html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false); html5QrcodeScanner.render(onScanSuccess); };
 
     function onScanSuccess(decodedText) {
       if(isPaused) return;
       if (!decodedText.toUpperCase().startsWith("ID")) {
-        isPaused = true; html5QrcodeScanner.pause();
-        showAlert('QR Tidak Valid', 'QR Code / Barcode yang Anda scan bukan milik sistem ini.', 'error'); return;
+        isPaused = true; html5QrcodeScanner.pause(); showAlert('QR Tidak Valid', 'QR Code / Barcode yang Anda scan bukan milik sistem ini.', 'error'); return;
       }
       isPaused = true; html5QrcodeScanner.pause(); showLoad(true);
       fetch(API_URL, { redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({action: "cekBarcode", barcode: decodedText}) })
@@ -137,30 +152,47 @@
         bdg.className = `px-4 py-1.5 rounded-full text-white text-sm font-bold shadow ${d.kondisi=='Baik'?'bg-emerald-500':d.kondisi=='Cukup Baik'?'bg-yellow-400 text-gray-800':d.kondisi=='Cukup Rusak'?'bg-orange-500':'bg-red-600'}`;
 
         let btnArea = document.getElementById('areaTombolAksi');
+        // Tombol Edit (Selalu Muncul)
+        btnArea.innerHTML = `<button onclick="bukaFormEdit('${d.barcode}', '${d.nama}', '${d.kondisi}')" class="w-full bg-white border-2 border-gray-300 text-gray-800 p-2.5 rounded-lg font-bold mb-3 hover:bg-gray-50"><i class="fas fa-edit mr-2 text-yellow-500"></i>Edit Data</button>`;
+
         if(d.status_pinjam === 'Tersedia') {
-          btnArea.innerHTML = `<button onclick="bukaFormPinjam('${d.barcode}')" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold">Pinjam Barang Ini</button>`;
+          btnArea.innerHTML += `<button onclick="bukaFormPinjam('${d.barcode}')" class="w-full bg-blue-600 text-white p-3.5 rounded-lg font-bold">Pinjam Barang Ini</button>`;
         } else {
-          btnArea.innerHTML = `<button onclick="bukaFormKembali('${d.barcode}', '${d.kondisi}')" class="w-full bg-emerald-500 text-white p-3 rounded-lg font-bold">Kembalikan Barang</button>`;
+          btnArea.innerHTML += `<button onclick="bukaFormKembali('${d.barcode}', '${d.kondisi}')" class="w-full bg-emerald-500 text-white p-3.5 rounded-lg font-bold">Kembalikan Barang</button>`;
         }
         openModal('modalDetail');
       }
     }
 
+    // Fungsi Form Submit
     function submitRegister(e) {
       e.preventDefault(); showLoad(true);
       const payload = { action: "daftarBarang", data: { barcode: document.getElementById('regBarcode').value, nama: document.getElementById('regNama').value, jenis: document.getElementById('regJenis').value, kondisi: document.getElementById('regKondisi').value } };
       fetch(API_URL, { redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify(payload) })
-      .then(res => res.json()).then(res => { showLoad(false); closeModal('modalRegister'); showAlert('Berhasil', 'Barang tersimpan: ' + res.no_ivt, 'success'); });
+      .then(res => res.json()).then(res => { clearCache(); showLoad(false); closeModal('modalRegister'); showAlert('Berhasil', 'Barang tersimpan: ' + res.no_ivt, 'success'); });
+    }
+
+    function bukaFormEdit(barcode, namaAwal, kondisiAwal) {
+      document.getElementById('editBarcode').value = barcode;
+      document.getElementById('editNama').value = namaAwal;
+      document.getElementById('editKondisi').value = kondisiAwal;
+      closeModal('modalDetail'); openModal('modalEdit');
+    }
+
+    function submitEdit(e) {
+      e.preventDefault(); showLoad(true);
+      const payload = { action: "editBarang", data: { barcode: document.getElementById('editBarcode').value, nama: document.getElementById('editNama').value, kondisi: document.getElementById('editKondisi').value } };
+      fetch(API_URL, { redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => { clearCache(); showLoad(false); closeModal('modalEdit'); showAlert('Sukses', res.message, 'success'); });
     }
 
     function bukaFormPinjam(barcode) {
       document.getElementById('pinjamBarcode').value = barcode; document.getElementById('pinjamTgl').valueAsDate = new Date();
       closeModal('modalDetail'); openModal('modalPinjam');
     }
-
     function bukaFormKembali(barcode, kondisiTerakhir) {
       document.getElementById('kembaliBarcode').value = barcode; document.getElementById('kembaliTgl').valueAsDate = new Date();
-      document.getElementById('kembaliKondisi').value = kondisiTerakhir; // Set otomatis ke kondisi terakhir
+      document.getElementById('kembaliKondisi').value = kondisiTerakhir;
       closeModal('modalDetail'); openModal('modalKembali');
     }
 
@@ -171,9 +203,8 @@
       reader.onload = function(evt) {
         const payload = { action: "prosesPinjam", data: { barcode: document.getElementById('pinjamBarcode').value, peminjam: document.getElementById('pinjamNama').value, telp: document.getElementById('pinjamTelp').value, tanggal: document.getElementById('pinjamTgl').value, fotoBase64: evt.target.result } };
         fetch(API_URL, { redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify(payload) })
-        .then(res => res.json()).then(res => { showLoad(false); closeModal('modalPinjam'); showAlert('Sukses', 'Barang dipinjam.', 'success'); document.getElementById('formPinjamAct').reset(); });
-      };
-      reader.readAsDataURL(file);
+        .then(res => res.json()).then(res => { clearCache(); showLoad(false); closeModal('modalPinjam'); showAlert('Sukses', 'Barang dipinjam.', 'success'); document.getElementById('formPinjamAct').reset(); });
+      }; reader.readAsDataURL(file);
     }
 
     function submitKembali(e) {
@@ -183,9 +214,8 @@
       reader.onload = function(evt) {
         const payload = { action: "prosesKembali", data: { barcode: document.getElementById('kembaliBarcode').value, tanggal: document.getElementById('kembaliTgl').value, kondisi: document.getElementById('kembaliKondisi').value, fotoBase64: evt.target.result } };
         fetch(API_URL, { redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify(payload) })
-        .then(res => res.json()).then(res => { showLoad(false); closeModal('modalKembali'); showAlert('Sukses', 'Barang dikembalikan ke inventaris.', 'success'); document.getElementById('formKembaliAct').reset(); });
-      };
-      reader.readAsDataURL(file);
+        .then(res => res.json()).then(res => { clearCache(); showLoad(false); closeModal('modalKembali'); showAlert('Sukses', 'Barang dikembalikan ke inventaris.', 'success'); document.getElementById('formKembaliAct').reset(); });
+      }; reader.readAsDataURL(file);
     }
 
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
