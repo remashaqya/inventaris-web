@@ -11,35 +11,80 @@
     <h1 class="text-xl font-bold"><i class="fas fa-boxes mr-2"></i>Inventaris</h1>
     <a href="index.html" class="text-white"><i class="fas fa-arrow-left text-xl"></i></a>
   </header>
-  <main class="p-4 max-w-lg mx-auto" id="tbBody">
-    <!-- Skeleton Loading -->
-    <div class="text-center text-gray-500 mt-10"><i class="fas fa-circle-notch fa-spin text-3xl mb-2 text-emerald-500"></i><p>Memuat data...</p></div>
+  
+  <main class="p-4 max-w-lg mx-auto">
+    <!-- Bar Pencarian -->
+    <div class="relative mb-4">
+      <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari nama, IVT, atau Barcode..." class="w-full p-3 pl-10 rounded-xl shadow-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+      <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
+    </div>
+
+    <!-- Container Daftar -->
+    <div id="tbBody">
+      <div class="text-center text-gray-500 mt-10"><i class="fas fa-circle-notch fa-spin text-3xl mb-2 text-emerald-500"></i><p>Memuat data...</p></div>
+    </div>
   </main>
+
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxx84YFVSb92cwBOX94F8twWkb1epAPV3nWiwRJX-HjrnK8jddlSgRxXqwTBvpPqPuF9A/exec"; 
-    fetch(API_URL, { redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({action: "getInventaris"}) })
-    .then(r => r.json()).then(res => {
+    let globalData = []; // Simpan data di memori untuk fitur pencarian
+
+    // Fungsi Render Card
+    function renderData(data, filterText = '') {
       let html = '';
-      res.data.reverse().forEach(row => { // Reverse agar data terbaru di atas
+      let filtered = data.filter(row => {
+        let textGabungan = (row[0] + ' ' + row[1] + ' ' + row[2] + ' ' + row[3]).toLowerCase();
+        return textGabungan.includes(filterText.toLowerCase());
+      });
+
+      filtered.reverse().forEach(row => { 
         let kondisi = row[4];
         let warnaK = kondisi=='Baik'?'bg-emerald-500':kondisi=='Cukup Baik'?'bg-yellow-400 text-gray-800':kondisi=='Cukup Rusak'?'bg-orange-500':'bg-red-600';
         let warnaS = row[5]=='Tersedia'?'text-emerald-600':'text-red-600';
 
         html += `
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex justify-between items-center mb-3">
-          <div>
-            <p class="text-[11px] text-gray-400 font-mono font-bold tracking-wider mb-0.5">${row[1]}</p>
-            <h3 class="font-bold text-gray-800 text-lg leading-tight">${row[2]}</h3>
-            <p class="text-xs text-gray-500 mt-1"><i class="fas fa-tag mr-1 text-gray-300"></i>${row[3]}</p>
-          </div>
-          <div class="flex flex-col items-end gap-2">
-            <span class="px-2.5 py-1 rounded-md text-white text-[10px] font-bold shadow-sm ${warnaK}">${kondisi}</span>
-            <span class="font-bold text-sm ${warnaS}">${row[5]}</span>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-3">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1">${row[2]}</h3>
+              <p class="text-[11px] text-gray-500 font-mono tracking-wide"><i class="fas fa-qrcode mr-1"></i>${row[0]} &nbsp;|&nbsp; <i class="fas fa-fingerprint mr-1"></i>${row[1]}</p>
+              <p class="text-xs text-gray-500 mt-1"><i class="fas fa-tag mr-1 text-gray-300"></i>${row[3]}</p>
+            </div>
+            <div class="flex flex-col items-end gap-2 ml-2">
+              <span class="px-2.5 py-1 rounded-md text-white text-[10px] font-bold shadow-sm ${warnaK}">${kondisi}</span>
+              <span class="font-bold text-sm ${warnaS}">${row[5]}</span>
+            </div>
           </div>
         </div>`;
       });
-      document.getElementById('tbBody').innerHTML = html || '<div class="text-center text-gray-500 mt-10">Belum ada data inventaris.</div>';
-    });
+      document.getElementById('tbBody').innerHTML = html || '<div class="text-center text-gray-500 mt-10">Data tidak ditemukan.</div>';
+    }
+
+    // Fungsi Pencarian
+    function filterData() {
+      const q = document.getElementById('searchInput').value;
+      renderData(globalData, q);
+    }
+
+    // SISTEM CACHE CANGGIH
+    function muatData() {
+      // 1. Tampilkan dari memori HP lokal agar instan
+      const cached = localStorage.getItem('cache_inventaris');
+      if (cached) {
+        globalData = JSON.parse(cached);
+        renderData(globalData);
+      }
+
+      // 2. Refresh diam-diam di balik layar
+      fetch(API_URL, { redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({action: "getInventaris"}) })
+      .then(r => r.json()).then(res => {
+        globalData = res.data;
+        localStorage.setItem('cache_inventaris', JSON.stringify(res.data)); // Simpan data baru
+        filterData(); // Update tampilan tanpa kedip
+      });
+    }
+
+    window.onload = muatData;
   </script>
 </body>
 </html>
