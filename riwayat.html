@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Riwayat Peminjaman</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body class="bg-gray-100 font-sans">
+    <header
+      class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 flex justify-between items-center"
+    >
+      <h1 class="text-xl font-bold">
+        <i class="fas fa-history mr-2"></i>Riwayat
+      </h1>
+      <a href="index.html" class="text-white"
+        ><i class="fas fa-arrow-left text-xl"></i
+      ></a>
+    </header>
+    <main class="p-4 max-w-4xl mx-auto">
+      <div class="bg-white rounded-xl shadow overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-gray-200 text-gray-700 text-sm">
+              <th class="p-3">Tgl Pinjam</th>
+              <th class="p-3">Peminjam</th>
+              <th class="p-3">Barcode</th>
+              <th class="p-3">Foto</th>
+              <th class="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbBody" class="text-sm">
+            <tr>
+              <td colspan="5" class="p-4 text-center">Memuat data...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+    <script>
+      const API_URL = "KODE_URL_APPSCRIPT_ANDA_DISINI";
+      fetch(API_URL, {
+        redirect: "follow",
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "getRiwayat" }),
+      })
+        .then((r) => r.json())
+        .then((res) => {
+          let html = "";
+          res.data.forEach((row) => {
+            // row[4] adalah tgl pinjam dari spreadsheet. Jika formatnya aneh, ubah di sheet ke text atau date biasa.
+            let tgl = new Date(row[4]).toLocaleDateString("id-ID");
+            html += `<tr class="border-b hover:bg-gray-50"><td class="p-3 text-xs">${tgl}</td><td class="p-3 font-bold">${row[2]}<br><span class="text-xs text-gray-500 font-normal">${row[3]}</span></td><td class="p-3 font-mono text-xs">${row[1]}</td><td class="p-3"><a href="${row[5]}" target="_blank" class="text-blue-500 underline text-xs">Lihat Foto</a></td><td class="p-3 font-semibold ${row[8] == "Selesai" ? "text-emerald-600" : "text-orange-500"}">${row[8]}</td></tr>`;
+          });
+          document.getElementById("tbBody").innerHTML =
+            html ||
+            '<tr><td colspan="5" class="text-center p-4">Belum ada transaksi</td></tr>';
+        });
+    </script>
+  </body>
+</html>
