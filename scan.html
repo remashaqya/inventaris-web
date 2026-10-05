@@ -9,7 +9,6 @@
   <style> .modal-bg { background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); } </style>
 </head>
 <body class="bg-gray-100">
-  <!-- Header -->
   <header class="bg-blue-700 text-white p-4 shadow-md flex justify-between items-center">
     <h1 class="text-xl font-bold"><i class="fas fa-qrcode mr-2"></i>Scanner</h1>
     <a href="index.html" class="text-white"><i class="fas fa-times text-2xl"></i></a>
@@ -21,29 +20,19 @@
     </div>
   </main>
 
-  <!-- MODAL LOADING -->
-  <div id="loader" class="hidden fixed inset-0 modal-bg z-[60] flex justify-center items-center">
-    <div class="bg-white p-5 rounded-lg flex flex-col items-center"><i class="fas fa-spinner fa-spin text-4xl text-blue-600 mb-2"></i><span class="font-bold">Memproses...</span></div>
-  </div>
-
-  <!-- MODAL ALERT NOTIFIKASI -->
+  <!-- MODAL LOADING & ALERT -->
+  <div id="loader" class="hidden fixed inset-0 modal-bg z-[60] flex justify-center items-center"><div class="bg-white p-5 rounded-lg flex flex-col items-center"><i class="fas fa-spinner fa-spin text-4xl text-blue-600 mb-2"></i><span class="font-bold">Memproses...</span></div></div>
   <div id="modalAlert" class="hidden fixed inset-0 modal-bg z-[70] flex justify-center items-center p-4">
     <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
-      <div id="alertIcon" class="text-4xl mb-3"></div>
-      <h3 id="alertTitle" class="text-xl font-bold text-gray-800 mb-2">Pesan</h3>
-      <p id="alertMsg" class="text-gray-600 mb-5 text-sm"></p>
-      <!-- Tombol ini sekarang memicu tutupAlert() agar scanner menyala kembali -->
-      <button onclick="tutupAlert()" class="w-full bg-blue-600 text-white p-2 rounded-lg font-bold shadow hover:bg-blue-700">OK Mengerti</button>
+      <div id="alertIcon" class="text-4xl mb-3"></div><h3 id="alertTitle" class="text-xl font-bold text-gray-800 mb-2">Pesan</h3><p id="alertMsg" class="text-gray-600 mb-5 text-sm"></p>
+      <button onclick="tutupAlert()" class="w-full bg-blue-600 text-white p-2 rounded-lg font-bold">OK Mengerti</button>
     </div>
   </div>
 
   <!-- MODAL REGISTER -->
   <div id="modalRegister" class="hidden fixed inset-0 modal-bg z-50 flex justify-center items-end sm:items-center">
-    <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl p-5 max-h-[90vh] overflow-y-auto transform transition-transform">
-      <div class="flex justify-between items-center border-b pb-3 mb-4">
-        <h3 class="font-bold text-lg"><i class="fas fa-plus text-emerald-500 mr-2"></i>Daftar Barang</h3>
-        <button onclick="closeModal('modalRegister'); resumeScan();" class="text-red-500"><i class="fas fa-times text-xl"></i></button>
-      </div>
+    <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl p-5 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-lg"><i class="fas fa-plus text-emerald-500 mr-2"></i>Daftar Barang</h3><button onclick="closeModal('modalRegister'); resumeScan();" class="text-red-500"><i class="fas fa-times text-xl"></i></button></div>
       <form onsubmit="submitRegister(event)">
         <input type="hidden" id="regBarcode">
         <label class="block text-sm font-bold text-gray-700 mb-1">Barcode ID</label>
@@ -55,17 +44,14 @@
         <datalist id="jenisList"></datalist>
         <label class="block text-sm font-bold mb-1">Kondisi Fisik</label>
         <select id="regKondisi" class="w-full p-2 border rounded mb-5">
-          <option value="Baik">🟢 Baik</option>
-          <option value="Cukup Baik">🟡 Cukup Baik</option>
-          <option value="Cukup Rusak">🟠 Cukup Rusak</option>
-          <option value="Rusak">🔴 Rusak</option>
+          <option value="Baik">🟢 Baik</option><option value="Cukup Baik">🟡 Cukup Baik</option><option value="Cukup Rusak">🟠 Cukup Rusak</option><option value="Rusak">🔴 Rusak</option>
         </select>
         <button type="submit" class="w-full bg-emerald-500 text-white p-3 rounded-lg font-bold">Simpan</button>
       </form>
     </div>
   </div>
 
-  <!-- MODAL DETAIL & AKSI -->
+  <!-- MODAL DETAIL -->
   <div id="modalDetail" class="hidden fixed inset-0 modal-bg z-50 flex justify-center items-end sm:items-center">
     <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl p-5 shadow-xl">
       <div class="text-right"><button onclick="closeModal('modalDetail'); resumeScan();" class="text-red-500 text-xl"><i class="fas fa-times"></i></button></div>
@@ -85,31 +71,39 @@
   <!-- MODAL FORM PINJAM -->
   <div id="modalPinjam" class="hidden fixed inset-0 modal-bg z-[55] flex justify-center items-end sm:items-center">
     <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl p-5 shadow-xl max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b pb-3 mb-4">
-        <h3 class="font-bold text-lg"><i class="fas fa-hand-holding text-blue-600 mr-2"></i>Peminjaman Barang</h3>
-        <button onclick="closeModal('modalPinjam'); resumeScan();" class="text-red-500"><i class="fas fa-times text-xl"></i></button>
-      </div>
+      <div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-lg"><i class="fas fa-hand-holding text-blue-600 mr-2"></i>Peminjaman Barang</h3><button onclick="closeModal('modalPinjam'); resumeScan();" class="text-red-500"><i class="fas fa-times text-xl"></i></button></div>
       <form id="formPinjamAct" onsubmit="submitPinjam(event)">
         <input type="hidden" id="pinjamBarcode">
-        <label class="block text-sm font-bold mb-1">Nama Peminjam</label>
-        <input type="text" id="pinjamNama" required class="w-full p-2 border rounded mb-3">
-        <label class="block text-sm font-bold mb-1">No. WhatsApp</label>
-        <input type="tel" id="pinjamTelp" required class="w-full p-2 border rounded mb-3">
-        <label class="block text-sm font-bold mb-1">Tanggal</label>
-        <input type="date" id="pinjamTgl" required class="w-full p-2 border rounded mb-3">
-        <label class="block text-sm font-bold mb-1">Upload Foto Bukti</label>
-        <input type="file" id="pinjamFoto" accept="image/*" capture="environment" required class="w-full p-2 border rounded mb-5 bg-gray-50 text-sm">
+        <label class="block text-sm font-bold mb-1">Nama Peminjam</label><input type="text" id="pinjamNama" required class="w-full p-2 border rounded mb-3">
+        <label class="block text-sm font-bold mb-1">No. WhatsApp</label><input type="tel" id="pinjamTelp" required class="w-full p-2 border rounded mb-3">
+        <label class="block text-sm font-bold mb-1">Tanggal</label><input type="date" id="pinjamTgl" required class="w-full p-2 border rounded mb-3">
+        <label class="block text-sm font-bold mb-1">Upload Foto Bukti Kondisi Awal</label><input type="file" id="pinjamFoto" accept="image/*" capture="environment" required class="w-full p-2 border rounded mb-5 bg-gray-50 text-sm">
         <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold">Proses Peminjaman</button>
       </form>
     </div>
   </div>
 
+  <!-- MODAL FORM PENGEMBALIAN -->
+  <div id="modalKembali" class="hidden fixed inset-0 modal-bg z-[55] flex justify-center items-end sm:items-center">
+    <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl p-5 shadow-xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-lg"><i class="fas fa-box-open text-emerald-500 mr-2"></i>Pengembalian Barang</h3><button onclick="closeModal('modalKembali'); resumeScan();" class="text-red-500"><i class="fas fa-times text-xl"></i></button></div>
+      <form id="formKembaliAct" onsubmit="submitKembali(event)">
+        <input type="hidden" id="kembaliBarcode">
+        <label class="block text-sm font-bold mb-1">Tanggal Dikembalikan</label><input type="date" id="kembaliTgl" required class="w-full p-2 border rounded mb-3">
+        <label class="block text-sm font-bold mb-1">Kondisi Fisik Saat Kembali</label>
+        <select id="kembaliKondisi" class="w-full p-2 border rounded mb-3">
+          <option value="Baik">🟢 Baik (Siap Pakai)</option><option value="Cukup Baik">🟡 Cukup Baik</option><option value="Cukup Rusak">🟠 Cukup Rusak</option><option value="Rusak">🔴 Rusak</option>
+        </select>
+        <label class="block text-sm font-bold mb-1">Upload Foto Bukti Kondisi Akhir</label><input type="file" id="kembaliFoto" accept="image/*" capture="environment" required class="w-full p-2 border rounded mb-5 bg-gray-50 text-sm">
+        <button type="submit" class="w-full bg-emerald-500 text-white p-3 rounded-lg font-bold">Proses Pengembalian</button>
+      </form>
+    </div>
+  </div>
+
   <script>
-    // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
     const API_URL = "https://script.google.com/macros/s/AKfycbxx84YFVSb92cwBOX94F8twWkb1epAPV3nWiwRJX-HjrnK8jddlSgRxXqwTBvpPqPuF9A/exec"; 
 
-    let html5QrcodeScanner;
-    let isPaused = false;
+    let html5QrcodeScanner; let isPaused = false;
 
     window.onload = function() {
       html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
@@ -118,135 +112,95 @@
 
     function onScanSuccess(decodedText) {
       if(isPaused) return;
-      
-      // LOGIKA BARU: Pengecekan awalan "ID"
-      // toUpperCase() digunakan agar "id-001" atau "ID-001" tetap terbaca.
       if (!decodedText.toUpperCase().startsWith("ID")) {
-        isPaused = true;
-        html5QrcodeScanner.pause();
-        // Munculkan notifikasi salah QR
-        showAlert('QR Tidak Valid', 'QR Code / Barcode yang Anda scan bukan milik sistem ini. (Harus berawalan "ID")', 'error');
-        return; // Hentikan eksekusi kode di bawahnya
+        isPaused = true; html5QrcodeScanner.pause();
+        showAlert('QR Tidak Valid', 'QR Code / Barcode yang Anda scan bukan milik sistem ini.', 'error'); return;
       }
-
-      // Jika lolos validasi "ID", baru proses ke database
-      isPaused = true;
-      html5QrcodeScanner.pause();
-      showLoad(true);
-      
-      fetch(API_URL, {
-        redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"},
-        body: JSON.stringify({action: "cekBarcode", barcode: decodedText})
-      })
-      .then(res => res.json())
-      .then(data => handleScanResult(data))
-      .catch(err => { 
-        showLoad(false); 
-        showAlert('Gagal', 'Terjadi kesalahan koneksi server.', 'error'); 
-      });
+      isPaused = true; html5QrcodeScanner.pause(); showLoad(true);
+      fetch(API_URL, { redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify({action: "cekBarcode", barcode: decodedText}) })
+      .then(res => res.json()).then(data => handleScanResult(data)).catch(err => { showLoad(false); showAlert('Gagal', 'Terjadi kesalahan koneksi.', 'error'); });
     }
 
     function handleScanResult(res) {
       showLoad(false);
       if(res.status === 'not_found') {
-        document.getElementById('regBarcode').value = res.barcode;
-        document.getElementById('regBarcodeTampil').value = res.barcode;
-        let dl = document.getElementById('jenisList'); dl.innerHTML = '';
-        res.list_jenis.forEach(j => { dl.innerHTML += `<option value="${j}">`; });
+        document.getElementById('regBarcode').value = res.barcode; document.getElementById('regBarcodeTampil').value = res.barcode;
+        let dl = document.getElementById('jenisList'); dl.innerHTML = ''; res.list_jenis.forEach(j => { dl.innerHTML += `<option value="${j}">`; });
         openModal('modalRegister');
       } else {
         let d = res.data;
-        document.getElementById('detIvt').innerText = d.no_ivt;
-        document.getElementById('detNama').innerText = d.nama;
-        document.getElementById('detJenis').innerText = d.jenis;
-        let st = document.getElementById('detStatus');
-        st.innerText = d.status_pinjam;
+        document.getElementById('detIvt').innerText = d.no_ivt; document.getElementById('detNama').innerText = d.nama; document.getElementById('detJenis').innerText = d.jenis;
+        let st = document.getElementById('detStatus'); st.innerText = d.status_pinjam;
         st.className = (d.status_pinjam === 'Tersedia') ? 'font-bold text-xl text-emerald-600' : 'font-bold text-xl text-red-600';
         
-        let bdg = document.getElementById('detKondisiBadge');
-        bdg.innerText = d.kondisi;
+        let bdg = document.getElementById('detKondisiBadge'); bdg.innerText = d.kondisi;
         bdg.className = `px-4 py-1.5 rounded-full text-white text-sm font-bold shadow ${d.kondisi=='Baik'?'bg-emerald-500':d.kondisi=='Cukup Baik'?'bg-yellow-400 text-gray-800':d.kondisi=='Cukup Rusak'?'bg-orange-500':'bg-red-600'}`;
 
         let btnArea = document.getElementById('areaTombolAksi');
         if(d.status_pinjam === 'Tersedia') {
           btnArea.innerHTML = `<button onclick="bukaFormPinjam('${d.barcode}')" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold">Pinjam Barang Ini</button>`;
         } else {
-          btnArea.innerHTML = `<button onclick="showAlert('Info', 'Modul pengembalian dalam tahap pengembangan.', 'info')" class="w-full bg-emerald-500 text-white p-3 rounded-lg font-bold">Kembalikan Barang</button>`;
+          btnArea.innerHTML = `<button onclick="bukaFormKembali('${d.barcode}', '${d.kondisi}')" class="w-full bg-emerald-500 text-white p-3 rounded-lg font-bold">Kembalikan Barang</button>`;
         }
         openModal('modalDetail');
       }
     }
 
     function submitRegister(e) {
-      e.preventDefault();
-      showLoad(true);
-      const payload = {
-        action: "daftarBarang",
-        data: { barcode: document.getElementById('regBarcode').value, nama: document.getElementById('regNama').value, jenis: document.getElementById('regJenis').value, kondisi: document.getElementById('regKondisi').value }
-      };
-      
+      e.preventDefault(); showLoad(true);
+      const payload = { action: "daftarBarang", data: { barcode: document.getElementById('regBarcode').value, nama: document.getElementById('regNama').value, jenis: document.getElementById('regJenis').value, kondisi: document.getElementById('regKondisi').value } };
       fetch(API_URL, { redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify(payload) })
-      .then(res => res.json())
-      .then(res => {
-        showLoad(false); closeModal('modalRegister');
-        showAlert('Berhasil', 'Barang tersimpan dengan nomor: ' + res.no_ivt, 'success');
-      });
+      .then(res => res.json()).then(res => { showLoad(false); closeModal('modalRegister'); showAlert('Berhasil', 'Barang tersimpan: ' + res.no_ivt, 'success'); });
     }
 
     function bukaFormPinjam(barcode) {
-      document.getElementById('pinjamBarcode').value = barcode;
-      document.getElementById('pinjamTgl').valueAsDate = new Date();
-      closeModal('modalDetail');
-      openModal('modalPinjam');
+      document.getElementById('pinjamBarcode').value = barcode; document.getElementById('pinjamTgl').valueAsDate = new Date();
+      closeModal('modalDetail'); openModal('modalPinjam');
+    }
+
+    function bukaFormKembali(barcode, kondisiTerakhir) {
+      document.getElementById('kembaliBarcode').value = barcode; document.getElementById('kembaliTgl').valueAsDate = new Date();
+      document.getElementById('kembaliKondisi').value = kondisiTerakhir; // Set otomatis ke kondisi terakhir
+      closeModal('modalDetail'); openModal('modalKembali');
     }
 
     function submitPinjam(e) {
       e.preventDefault();
-      const file = document.getElementById('pinjamFoto').files[0];
-      if(!file) {
-          showAlert('Peringatan','Mohon upload foto!','error');
-          return;
-      }
-      
-      showLoad(true);
-      const reader = new FileReader();
+      const file = document.getElementById('pinjamFoto').files[0]; if(!file) { showAlert('Peringatan','Mohon upload foto!','error'); return; }
+      showLoad(true); const reader = new FileReader();
       reader.onload = function(evt) {
-        const payload = {
-          action: "prosesPinjam",
-          data: { barcode: document.getElementById('pinjamBarcode').value, peminjam: document.getElementById('pinjamNama').value, telp: document.getElementById('pinjamTelp').value, tanggal: document.getElementById('pinjamTgl').value, fotoBase64: evt.target.result }
-        };
+        const payload = { action: "prosesPinjam", data: { barcode: document.getElementById('pinjamBarcode').value, peminjam: document.getElementById('pinjamNama').value, telp: document.getElementById('pinjamTelp').value, tanggal: document.getElementById('pinjamTgl').value, fotoBase64: evt.target.result } };
         fetch(API_URL, { redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify(payload) })
-        .then(res => res.json())
-        .then(res => {
-          showLoad(false); closeModal('modalPinjam');
-          showAlert('Sukses', 'Data peminjaman berhasil dicatat.', 'success');
-          document.getElementById('formPinjamAct').reset();
-        });
+        .then(res => res.json()).then(res => { showLoad(false); closeModal('modalPinjam'); showAlert('Sukses', 'Barang dipinjam.', 'success'); document.getElementById('formPinjamAct').reset(); });
       };
       reader.readAsDataURL(file);
     }
 
-    // UTILITIES UI MODAL
+    function submitKembali(e) {
+      e.preventDefault();
+      const file = document.getElementById('kembaliFoto').files[0]; if(!file) { showAlert('Peringatan','Mohon upload foto!','error'); return; }
+      showLoad(true); const reader = new FileReader();
+      reader.onload = function(evt) {
+        const payload = { action: "prosesKembali", data: { barcode: document.getElementById('kembaliBarcode').value, tanggal: document.getElementById('kembaliTgl').value, kondisi: document.getElementById('kembaliKondisi').value, fotoBase64: evt.target.result } };
+        fetch(API_URL, { redirect: "follow", method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify(payload) })
+        .then(res => res.json()).then(res => { showLoad(false); closeModal('modalKembali'); showAlert('Sukses', 'Barang dikembalikan ke inventaris.', 'success'); document.getElementById('formKembaliAct').reset(); });
+      };
+      reader.readAsDataURL(file);
+    }
+
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
     function showLoad(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
     function resumeScan() { isPaused = false; if(html5QrcodeScanner.getState() !== 2) html5QrcodeScanner.resume(); }
-
     function showAlert(title, msg, type) {
-      document.getElementById('alertTitle').innerText = title;
-      document.getElementById('alertMsg').innerText = msg;
+      document.getElementById('alertTitle').innerText = title; document.getElementById('alertMsg').innerText = msg;
       let icon = document.getElementById('alertIcon');
       if(type === 'success') icon.innerHTML = '<i class="fas fa-check-circle text-emerald-500"></i>';
       else if(type === 'error') icon.innerHTML = '<i class="fas fa-exclamation-circle text-red-500"></i>';
       else icon.innerHTML = '<i class="fas fa-info-circle text-blue-500"></i>';
       openModal('modalAlert');
     }
-
-    // Fungsi khusus untuk menutup alert dan langsung menyalakan ulang kamera
-    function tutupAlert() {
-      closeModal('modalAlert');
-      resumeScan();
-    }
+    function tutupAlert() { closeModal('modalAlert'); resumeScan(); }
   </script>
 </body>
 </html>
