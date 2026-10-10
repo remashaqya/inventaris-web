@@ -15,7 +15,7 @@
   <main class="p-4 max-w-lg mx-auto">
     <!-- Bar Pencarian -->
     <div class="relative mb-4">
-      <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari nama peminjam, barang, IVT..." class="w-full p-3 pl-10 rounded-xl shadow-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari nama peminjam, barang, Inv..." class="w-full p-3 pl-10 rounded-xl shadow-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
       <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
     </div>
 
@@ -55,7 +55,7 @@
           
           <div class="bg-gray-50 p-3 rounded-lg text-sm text-gray-700 space-y-2 mb-3">
             <p class="font-bold text-gray-900 border-b border-gray-200 pb-1 mb-1"><i class="fas fa-box-open mr-2 text-indigo-400"></i>${row[9] || 'Barang Tidak Diketahui'}</p>
-            <p class="flex justify-between"><span class="text-gray-500">Barcode/IVT:</span> <span class="font-mono text-xs font-semibold">${row[1]} <span class="text-gray-300">|</span> ${row[10] || '-'}</span></p>
+            <p class="flex justify-between"><span class="text-gray-500">ID/No Barang:</span> <span class="font-mono text-xs font-semibold">${row[1]} <span class="text-gray-300">|</span> ${row[10] || '-'}</span></p>
             <p class="flex justify-between"><span class="text-gray-500">Tgl Pinjam:</span> <span class="font-semibold">${tglPinjam}</span></p>
             <p class="flex justify-between"><span class="text-gray-500">Tgl Kembali:</span> <span class="font-semibold">${tglKembali}</span></p>
           </div>
